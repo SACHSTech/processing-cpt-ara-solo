@@ -184,14 +184,4 @@ public class SlotMachineGame {
         System.out.print("Do you want to play again? (yes/no): ");
         return scanner.next().equalsIgnoreCase("yes");
     }
-
-    /**
-     * Prints the spin history log.
-     */
-    private void printSpinHistory() {
-        System.out.println("\nSpin History:");
-        for (String log : spinHistory) {
-            System.out.println(log);
-        }
-    }
 }

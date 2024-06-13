@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Random;
-
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -8,6 +7,8 @@ import processing.core.PImage;
 public class Money extends PApplet {
     String[] SYMBOLS = { "Cherry", "Lemon", "Orange", "Bell", "Star", "Seven" };
     double[] PAYOUTS = { 2.0, 1.5, 1.25, 1.75, 3.0, 5.0 };
+    double[] TWO_SYMBOL_PAYOUTS = { 0.5, 0.4, 0.3, 0.35, 0.75, 1.0 }; // Payouts for two matching symbols
+    int[] SYMBOL_WEIGHTS = { 10, 20, 30, 20, 15, 5 }; // Weighted probabilities for each symbol
     int SYMBOLS_COUNT = SYMBOLS.length;
 
     double balance = 10000.0;
@@ -99,10 +100,11 @@ public class Money extends PApplet {
     void spinReels() {
         String[] result = new String[3];
 
+        // Weighted random selection for each reel
         for (int i = 0; i < 3; i++) {
-            int index = random.nextInt(SYMBOLS_COUNT);
-            result[i] = SYMBOLS[index];
-            currentReels[i] = reelImages[index];
+            int selectedIndex = getRandomWeightedIndex();
+            result[i] = SYMBOLS[selectedIndex];
+            currentReels[i] = reelImages[selectedIndex];
         }
 
         spinDuration++;
@@ -121,11 +123,36 @@ public class Money extends PApplet {
         }
     }
 
+    int getRandomWeightedIndex() {
+        int totalWeight = 0;
+        for (int weight : SYMBOL_WEIGHTS) {
+            totalWeight += weight;
+        }
+
+        int randomNumber = random.nextInt(totalWeight);
+        int cumulativeWeight = 0;
+
+        for (int i = 0; i < SYMBOL_WEIGHTS.length; i++) {
+            cumulativeWeight += SYMBOL_WEIGHTS[i];
+            if (randomNumber < cumulativeWeight) {
+                return i;
+            }
+        }
+
+        return -1; // Should never reach here
+    }
+
     double calculatePayout(String[] result) {
         if (result[0].equals(result[1]) && result[1].equals(result[2])) {
             for (int i = 0; i < SYMBOLS_COUNT; i++) {
                 if (SYMBOLS[i].equals(result[0])) {
                     return betAmount * PAYOUTS[i];
+                }
+            }
+        } else if (result[0].equals(result[1]) || result[1].equals(result[2]) || result[0].equals(result[2])) {
+            for (int i = 0; i < SYMBOLS_COUNT; i++) {
+                if (SYMBOLS[i].equals(result[0]) || SYMBOLS[i].equals(result[1]) || SYMBOLS[i].equals(result[2])) {
+                    return betAmount * TWO_SYMBOL_PAYOUTS[i];
                 }
             }
         }

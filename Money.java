@@ -171,4 +171,5 @@ public class Money extends PApplet {
     String prompt(String message) {
         return javax.swing.JOptionPane.showInputDialog(frame, message);
     }
+    
 }
